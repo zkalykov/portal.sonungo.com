@@ -47,6 +47,7 @@ export interface Assignment {
   points_possible: number;
   submission_types: string[];
   has_submitted_submissions: boolean;
+  quiz_id?: number;
   rubric?: RubricCriterion[];
   submission?: Submission;
 }
@@ -141,6 +142,91 @@ export interface Attachment {
   size: number;
   content_type: string;
   created_at: string;
+}
+
+export interface DiscussionEntry {
+  id: number;
+  user_id: number;
+  parent_id: number | null;
+  created_at: string;
+  updated_at: string;
+  message: string;
+  user_name: string;
+  user?: {
+    id: number;
+    display_name: string;
+    avatar_image_url: string;
+    html_url?: string;
+  };
+  can_rate?: boolean;
+  rating_sum?: number;
+  rating_count?: number;
+  has_more_replies?: boolean;
+  replies?: DiscussionEntry[];
+}
+
+export interface Quiz {
+  id: number;
+  title: string;
+  html_url: string;
+  mobile_url: string;
+  description: string;
+  quiz_type: string;
+  time_limit: number | null;
+  shuffle_answers: boolean;
+  show_correct_answers: boolean;
+  scoring_policy: string;
+  point_value: number;
+  question_count: number;
+  has_access_code: boolean;
+  due_at: string | null;
+  lock_at: string | null;
+  unlock_at: string | null;
+  published: boolean;
+  locked_for_user: boolean;
+  lock_info?: any;
+  lock_explanation?: string;
+}
+
+export interface QuizSubmission {
+  id: number;
+  quiz_id: number;
+  user_id: number;
+  submission_id: number;
+  started_at: string;
+  finished_at: string | null;
+  end_at: string | null;
+  attempt: number;
+  extra_attempts: number;
+  extra_time: number;
+  time_spent: number;
+  score: number;
+  score_before_regrade: number;
+  kept_score: number;
+  fudge_points: number;
+  has_seen_results: boolean;
+  workflow_state: 'untaken' | 'pending_review' | 'complete' | 'settings_only' | 'preview';
+  validation_token: string;
+}
+
+export interface QuizQuestion {
+  id: number;
+  quiz_id: number;
+  position: number;
+  question_name: string;
+  question_type: string;
+  question_text: string;
+  points_possible: number;
+  correct_comments: string;
+  incorrect_comments: string;
+  neutral_comments: string;
+  answers: {
+    id: number;
+    text: string;
+    html: string;
+    comments: string;
+    weight: number;
+  }[];
 }
 
 // App-specific types

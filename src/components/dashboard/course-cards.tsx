@@ -85,7 +85,7 @@ function CourseCard({
 }) {
   const { data: assignments, loading } = useAssignments(courseId);
 
-  const categorizeAssignments = (items: Assignment[] | null) => {
+  const categorizeAssignments = (items: Assignment[] | null | undefined) => {
     if (!items) return { quizzes: [], tasks: [], other: [] };
 
     const upcoming = items.filter(a => a.due_at && !isPast(new Date(a.due_at)));

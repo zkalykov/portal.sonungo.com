@@ -262,7 +262,7 @@ function CanvasTaskItem({
   courses,
 }: {
   item: { assignment?: { name: string; due_at?: string | null }; context_name: string; html_url: string };
-  courses: { id: number; course_code: string }[] | null;
+  courses: { id: number; course_code: string }[] | null | undefined;
 }) {
   return (
     <a

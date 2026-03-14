@@ -1,6 +1,6 @@
 'use client';
 
-import { useCanvasConfig } from '@/hooks/use-canvas';
+import { useAuth } from '@/lib/auth-context';
 import { UpcomingAssignments } from '@/components/dashboard/upcoming-assignments';
 import { GradesOverview } from '@/components/dashboard/grades-overview';
 import { WorkloadHeatmap } from '@/components/dashboard/workload-heatmap';
@@ -10,35 +10,46 @@ import { AnnouncementsFeed } from '@/components/dashboard/announcements-feed';
 import { DiscussionsTracker } from '@/components/dashboard/discussions-tracker';
 import { CourseCards } from '@/components/dashboard/course-cards';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { AlertTriangle } from 'lucide-react';
+import { MessageCircle, Send } from 'lucide-react';
 
 export default function DashboardPage() {
-  const isConfigured = useCanvasConfig();
+  const { isAuthenticated, isLoading } = useAuth();
 
-  if (!isConfigured) {
+  if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[50vh]">
-        <Card className="max-w-md">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-orange-500">
-              <AlertTriangle className="h-5 w-5" />
-              Canvas API Not Configured
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <p className="text-sm text-muted-foreground">
-              To use the Canvas Dashboard, you need to configure your Canvas API credentials.
-            </p>
-            <ol className="text-sm space-y-2 list-decimal list-inside">
-              <li>Copy <code className="bg-muted px-1 rounded">.env.example</code> to <code className="bg-muted px-1 rounded">.env.local</code></li>
-              <li>Get your API token from Canvas → Account → Settings → Approved Integrations</li>
-              <li>Add your token and Canvas URL to <code className="bg-muted px-1 rounded">.env.local</code></li>
-              <li>Restart the development server</li>
-            </ol>
-            <div className="bg-muted rounded-lg p-3 text-xs font-mono">
-              <p>NEXT_PUBLIC_CANVAS_API_TOKEN=your_token</p>
-              <p>NEXT_PUBLIC_CANVAS_BASE_URL=https://canvas.your-school.edu</p>
+        <div className="animate-pulse text-muted-foreground">Loading...</div>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-background">
+        <Card className="max-w-md w-full mx-4 shadow-lg">
+          <CardHeader className="text-center pb-2">
+            <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/30">
+              <MessageCircle className="h-7 w-7 text-blue-500" />
             </div>
+            <CardTitle className="text-xl">Welcome to Canvas Portal</CardTitle>
+          </CardHeader>
+          <CardContent className="text-center space-y-4">
+            <p className="text-sm text-muted-foreground">
+              To access your Canvas dashboard, please authenticate via our Telegram bot.
+              Type <code className="bg-muted px-1.5 py-0.5 rounded text-xs font-mono">/portal</code> in the bot to get your login link.
+            </p>
+            <a
+              href="https://t.me/canvas_sonungo_com_bot"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 rounded-lg bg-blue-500 px-5 py-2.5 text-sm font-medium text-white shadow-sm transition-colors hover:bg-blue-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+            >
+              <Send className="h-4 w-4" />
+              Open Telegram Bot
+            </a>
+            <p className="text-xs text-muted-foreground pt-2">
+              The auth link expires in 1 minute and can only be used once.
+            </p>
           </CardContent>
         </Card>
       </div>

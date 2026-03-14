@@ -49,12 +49,9 @@ export function AnnouncementsPage() {
             ) : (
               <div className="space-y-4">
                 {announcements.map(announcement => (
-                  <a
+                  <div
                     key={announcement.id}
-                    href={announcement.html_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="block rounded-lg border p-4 transition-colors hover:bg-muted"
+                    className="block rounded-lg border p-4 transition-colors bg-card"
                   >
                     <div className="flex items-start gap-4">
                       <Avatar className="h-10 w-10">
@@ -83,17 +80,26 @@ export function AnnouncementsPage() {
                           )}
                         </div>
 
-                        <h3 className="font-semibold mb-2">{announcement.title}</h3>
+                        <h3 className="text-xl font-bold mb-4">{announcement.title}</h3>
 
                         <div
-                          className="prose prose-sm dark:prose-invert max-w-none text-sm line-clamp-3"
+                          className="prose prose-sm dark:prose-invert max-w-none text-base"
                           dangerouslySetInnerHTML={{ __html: announcement.message }}
                         />
+                        
+                        <div className="mt-4 pt-4 border-t flex justify-end">
+                            <a 
+                                href={announcement.html_url} 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="text-sm text-primary flex items-center gap-1 hover:underline"
+                            >
+                                View original on Canvas <ExternalLink className="w-3 h-3" />
+                            </a>
+                        </div>
                       </div>
-
-                      <ExternalLink className="h-4 w-4 text-muted-foreground flex-shrink-0" />
                     </div>
-                  </a>
+                  </div>
                 ))}
               </div>
             )}

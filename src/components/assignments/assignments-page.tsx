@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import { useAssignments, useCourses } from '@/hooks/use-canvas';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { AssignmentSubmission } from './assignment-submission';
+import { QuizEngine } from '@/components/quizzes/quiz-engine';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -266,13 +268,33 @@ export function AssignmentsPage() {
                 {selectedAssignment.submission_types && (
                   <div>
                     <h4 className="font-medium mb-2">Submission Types</h4>
-                    <div className="flex gap-2 flex-wrap">
+                    <div className="flex gap-2 flex-wrap mb-4">
                       {selectedAssignment.submission_types.map(type => (
                         <Badge key={type} variant="outline">
                           {type.replace(/_/g, ' ')}
                         </Badge>
                       ))}
                     </div>
+                    
+                    {/* Render Quiz Engine if it's an online_quiz */}
+                    {selectedAssignment.submission_types.includes('online_quiz') && selectedAssignment.quiz_id ? (
+                      <QuizEngine 
+                        courseId={selectedAssignment.course_id} 
+                        quiz={selectedAssignment as any} // we'll fetch full quiz details inside the engine if needed, or pass it as is. Wait, Assignment obj doesn't have all quiz fields. We need to fetch the quiz or just pass the ID.
+                      />
+                    ) : (
+                      /* Submission Component if types include online stuff */
+                      selectedAssignment.submission_types.some(t => 
+                        ['online_text_entry', 'online_url', 'online_upload'].includes(t)
+                      ) && (
+                        <AssignmentSubmission 
+                          assignment={selectedAssignment}
+                          onSuccess={() => {
+                            // Could trigger a re-fetch here
+                          }}
+                        />
+                      )
+                    )}
                   </div>
                 )}
 

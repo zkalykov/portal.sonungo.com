@@ -12,78 +12,74 @@ import type {
   TodoItem,
 } from '@/lib/types';
 
+import useSWR from 'swr';
+
 // Generic hook for data fetching
 function useCanvasData<T>(
-  fetcher: () => Promise<T>,
-  dependencies: unknown[] = []
+  key: string | null,
+  fetcher: () => Promise<T>
 ) {
-  const [data, setData] = useState<T | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
-
-  const refetch = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const result = await fetcher();
-      setData(result);
-    } catch (err) {
-      setError(err instanceof Error ? err : new Error('Unknown error'));
-    } finally {
-      setLoading(false);
+  const { data, error, isLoading, mutate } = useSWR<T>(
+    key,
+    fetcher,
+    {
+      revalidateOnFocus: false, // Don't constantly refetch when switching tabs
+      dedupingInterval: 60000, // Deduplicate requests within 1 minute
+      errorRetryCount: 1, // Minimize aggressive retries on error
     }
-  }, dependencies);
+  );
 
-  useEffect(() => {
-    refetch();
-  }, [refetch]);
-
-  return { data, loading, error, refetch };
+  return { 
+    data, 
+    loading: isLoading, 
+    error, 
+    refetch: mutate 
+  };
 }
 
 // Courses with grades
 export function useCourses() {
-  return useCanvasData<CourseWithGrade[]>(() => canvasApi.getCoursesWithGrades());
+  return useCanvasData<CourseWithGrade[]>('canvas_courses_grades', () => canvasApi.getCoursesWithGrades());
 }
 
 // Assignments
 export function useAssignments(courseId?: number) {
   return useCanvasData<Assignment[]>(
-    () => courseId ? canvasApi.getAssignments(courseId) : canvasApi.getAllAssignments(),
-    [courseId]
+    courseId ? `canvas_assignments_${courseId}` : 'canvas_all_assignments',
+    () => courseId ? canvasApi.getAssignments(courseId) : canvasApi.getAllAssignments()
   );
 }
 
 export function useUpcomingAssignments() {
-  return useCanvasData<Assignment[]>(() => canvasApi.getUpcomingAssignments());
+  return useCanvasData<Assignment[]>('canvas_upcoming_assignments', () => canvasApi.getUpcomingAssignments());
 }
 
 // Calendar
 export function useCalendar(startDate: string, endDate: string) {
   return useCanvasData<CalendarEvent[]>(
-    () => canvasApi.getAllCalendarItems(startDate, endDate),
-    [startDate, endDate]
+    `canvas_calendar_${startDate}_${endDate}`,
+    () => canvasApi.getAllCalendarItems(startDate, endDate)
   );
 }
 
 // Announcements
 export function useAnnouncements() {
-  return useCanvasData<Announcement[]>(() => canvasApi.getAnnouncements());
+  return useCanvasData<Announcement[]>('canvas_announcements', () => canvasApi.getAnnouncements());
 }
 
 // Discussions
 export function useDiscussions() {
-  return useCanvasData<DiscussionTopic[]>(() => canvasApi.getAllDiscussions());
+  return useCanvasData<DiscussionTopic[]>('canvas_discussions', () => canvasApi.getAllDiscussions());
 }
 
 // To-Do
 export function useTodoItems() {
-  return useCanvasData<TodoItem[]>(() => canvasApi.getTodoItems());
+  return useCanvasData<TodoItem[]>('canvas_todo', () => canvasApi.getTodoItems());
 }
 
 // User
 export function useUser() {
-  return useCanvasData<User>(() => canvasApi.getCurrentUser());
+  return useCanvasData<User>('canvas_user', () => canvasApi.getCurrentUser());
 }
 
 // Check if API is configured
