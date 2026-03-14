@@ -24,26 +24,27 @@ export default function AuthCodePage({ params }: { params: Promise<{ code: strin
 
     async function exchangeCode() {
       try {
-        const response = await fetch('https://canvas.sonungo.com/api/portal/auth', {
+        const response = await fetch('/api/auth/exchange', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ code }),
         });
 
         if (!response.ok) {
-          const error = await response.json().catch(() => ({ detail: 'Unknown error' }));
-          setErrorMessage(error.detail || `Authentication failed (${response.status})`);
+          const error = await response.json().catch(() => ({ error: 'Unknown error' }));
+          setErrorMessage(error.error || error.detail || `Authentication failed (${response.status})`);
           setStatus('error');
           return;
         }
 
         const data = await response.json();
 
-        if (data.status === 'success' && data.canvas_url && data.canvas_token) {
-          await login(data.canvas_url, data.canvas_token);
+        if (data.success) {
           setStatus('success');
-          // Short delay so user sees success, then redirect
-          setTimeout(() => router.replace('/'), 1200);
+          // Short delay so user sees success, then full reload to trigger strictly server-side re-hydration
+          setTimeout(() => {
+            window.location.href = '/';
+          }, 1200);
         } else {
           setErrorMessage('Invalid response from authentication server');
           setStatus('error');
