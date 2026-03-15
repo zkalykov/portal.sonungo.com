@@ -4,7 +4,6 @@ import { useCourses, useAssignments } from '@/hooks/use-canvas';
 import { useHiddenCourses } from '@/hooks/use-hidden-courses';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import {
@@ -14,7 +13,6 @@ import {
   CheckCircle,
   Clock,
   ExternalLink,
-  X,
 } from 'lucide-react';
 import { format, isPast } from 'date-fns';
 import type { Assignment } from '@/lib/types';
@@ -65,7 +63,6 @@ export function CourseCards() {
           courseId={course.id}
           courseName={course.name}
           courseCode={course.course_code}
-          onHide={() => hideCourse(course.id)}
         />
       ))}
     </div>
@@ -76,12 +73,10 @@ function CourseCard({
   courseId,
   courseName,
   courseCode,
-  onHide,
 }: {
   courseId: number;
   courseName: string;
   courseCode: string;
-  onHide: () => void;
 }) {
   const { data: assignments, loading } = useAssignments(courseId);
 
@@ -130,23 +125,10 @@ function CourseCard({
   return (
     <Card>
       <CardHeader className="pb-3">
-        <div className="flex items-start justify-between">
-          <CardTitle className="flex items-center gap-2 text-base">
-            <BookOpen className="h-4 w-4" />
-            <span className="truncate">{courseCode}</span>
-          </CardTitle>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-6 w-6 -mr-2 -mt-1"
-            onClick={(e) => {
-              e.preventDefault();
-              onHide();
-            }}
-          >
-            <X className="h-4 w-4" />
-          </Button>
-        </div>
+        <CardTitle className="flex items-center gap-2 text-base">
+          <BookOpen className="h-4 w-4" />
+          <span className="truncate">{courseCode}</span>
+        </CardTitle>
         <p className="text-xs text-muted-foreground truncate">{courseName}</p>
       </CardHeader>
       <CardContent>
@@ -159,7 +141,7 @@ function CourseCard({
         ) : allItems.length === 0 ? (
           <p className="text-sm text-muted-foreground">No upcoming items</p>
         ) : (
-          <ScrollArea className="h-48">
+          <ScrollArea className="h-32 md:h-48">
             <div className="space-y-2 pr-4">
               {allItems.slice(0, 8).map(item => {
                 const submitted = isSubmitted(item);
@@ -172,7 +154,7 @@ function CourseCard({
                     href={item.html_url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className={`flex items-center gap-2 rounded-lg border p-2 text-sm transition-colors hover:bg-muted ${
+                    className={`flex items-center gap-2 rounded-lg border p-1.5 md:p-2 text-sm transition-colors hover:bg-muted ${
                       submitted ? 'bg-green-500/10 border-green-500/30' : ''
                     }`}
                   >

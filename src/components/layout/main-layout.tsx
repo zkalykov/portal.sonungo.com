@@ -1,6 +1,7 @@
 'use client';
 
 import { useAuth } from '@/lib/auth-context';
+import { SidebarProvider } from './sidebar-context';
 import { Sidebar } from './sidebar';
 import { Header } from './header';
 
@@ -31,12 +32,15 @@ export function MainLayout({ children }: MainLayoutProps) {
 
   // Authenticated: full layout with sidebar and header
   return (
-    <div className="min-h-screen bg-background overflow-x-hidden">
-      <Sidebar />
-      <div className="pl-64 min-w-0">
-        <Header />
-        <main className="p-6 min-w-0 overflow-hidden">{children}</main>
+    <SidebarProvider>
+      <div className="min-h-screen bg-background overflow-x-hidden">
+        <Sidebar />
+        {/* pl-0 on mobile (sidebar is an overlay), pl-64 on desktop */}
+        <div className="md:pl-64 min-w-0">
+          <Header />
+          <main className="p-4 md:p-6 min-w-0 overflow-hidden">{children}</main>
+        </div>
       </div>
-    </div>
+    </SidebarProvider>
   );
 }

@@ -1,8 +1,9 @@
 'use client';
 
 import { useTheme } from 'next-themes';
-import { Moon, Sun } from 'lucide-react';
+import { Moon, Sun, Menu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useSidebar } from './sidebar-context';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,10 +13,23 @@ import {
 
 export function Header() {
   const { setTheme } = useTheme();
+  const { toggle } = useSidebar();
 
   return (
-    <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b bg-background px-6">
-      <div />
+    <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b bg-background px-4 md:px-6">
+      {/* Hamburger menu — mobile only */}
+      <Button
+        variant="ghost"
+        size="icon"
+        className="md:hidden"
+        onClick={toggle}
+        aria-label="Toggle sidebar"
+      >
+        <Menu className="h-5 w-5" />
+      </Button>
+
+      {/* Spacer for desktop */}
+      <div className="hidden md:block" />
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
